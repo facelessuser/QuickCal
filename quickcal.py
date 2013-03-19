@@ -15,8 +15,7 @@ import re
 from os.path import join, exists
 from os import makedirs
 import json
-import urllib
-import subprocess
+import urllib.request
 
 
 months = enum("January February March April May June July August September October November December", start=1, name="Months")
@@ -88,11 +87,9 @@ class QuickCal(object):
                 try:
                     response = urllib.request.urlretrieve(html_file, holiday_list)
                 except:
-                    ps = subprocess.Popen(['curl', '-o', '%s' % holiday_list, html_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    ps.communicate()
-            if exists(holiday_list):
-                with open(holiday_list, 'r') as f:
-                    holidays[year] = json.loads("[%s]" % ','.join(f.readlines()))
+                    return
+            with open(holiday_list, 'r') as f:
+                holidays[year] = json.loads("[%s]" % ','.join(f.readlines()))
 
     def list_holidays(self, year, month):
         bfr = ""
