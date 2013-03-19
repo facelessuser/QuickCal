@@ -1,5 +1,14 @@
 {
+    // Locale for holidays, this is what will get pulled down from holidata.net
+    // Please check http://holidata.net/locale_index.html to see available locale
+    "locale": "en-US",
+
+    // Sub region of locale.  For example, in the US, a sub region would be a state
+    // such as Florida (FL).  If you have doubts about what to use, you can look in
+    // one of the JSON files at http://holidata.net/locale_index.html to see what
+    // regions are referenced in you locale file.
     "region": "",
-    "local": "en-US",
+
+    // Start with Sunday first when displaying calendar
     "sunday_first": true
 }

@@ -85,13 +85,13 @@ class Day(object):
 class QuickCal(object):
     def init_holidays(self):
         global CAL_HOLIDAYS
-        local = sublime.load_settings("quickcal.sublime-settings").get("local", "en-US")
-        holiday_list = join(CAL_EVENTS, "%d_%s.json" % (self.year, local))
+        locale = sublime.load_settings("quickcal.sublime-settings").get("locale", "en-US")
+        holiday_list = join(CAL_EVENTS, "%d_%s.json" % (self.year, locale))
         if self.force_update:
             CAL_HOLIDAYS = {}
         if self.year not in CAL_HOLIDAYS:
             if not exists(holiday_list):
-                html_file = "http://holidata.net/%s/%d.json" % (local, self.year)
+                html_file = "http://holidata.net/%s/%d.json" % (locale, self.year)
                 try:
                     response = urllib.request.urlretrieve(html_file, holiday_list)
                 except:
