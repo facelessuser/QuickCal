@@ -17,9 +17,10 @@ from os import makedirs
 import json
 import urllib.request
 
-
 MONTHS = enum("January February March April May June July August September October November December", start=1, name="Months")
 WEEKDAYS = enum("Monday Tuesday Wednesday Thursday Friday Saturday Sunday", start=1, name="Days")
+
+# Calendar display resources
 CAL_HEADER = "|{0:^69}|\n"
 CAL_ROW_TOP_DIV = "-----------------------------------------------------------------------\n"
 CAL_ROW_MID_DIV = "-----------------------------------------------------------------------\n"
@@ -34,10 +35,30 @@ CAL_CELL_EMPTY = "         "
 CAL_CELL_EMPTY_WALL = " "
 CAL_CELL_WALL = "|"
 CAL_HEADER_DAYS = "|   %s   |   %s   |   %s   |   %s   |   %s   |   %s   |   %s   |\n"
-
-HOLIDAYS = {}
+CAL_COL_LENGTH = 3
 CAL_EVENTS = ""
+CAL_HOLIDAYS = {}
+
 QCAL = None
+
+SHORT_MONTH = 30
+LONG_MONTH = 31
+FEB_MONTH = 28
+FEB_LEAP_MONTH = 29
+DAYS_IN_WEEK = 7
+
+
+def get_today():
+    obj = date.today()
+    return Day(obj.day, MONTHS(obj.month), obj.year)
+
+
+def tx_day(day):
+    m = re.match(r"^(\d+)[^\d](\d+)[^\d](\d+)$", day)
+    if m:
+        return Day(m.group(2), MONTHS(int(m.group(1))), m.group(3))
+    else:
+        return get_today()
 
 
 class CalendarEventListener(sublime_plugin.EventListener):
@@ -61,27 +82,14 @@ class Day(object):
         return ("%d/%d/%d" % (self.month.value, self.day, self.year))
 
 
-def get_today():
-    obj = date.today()
-    return Day(obj.day, MONTHS(obj.month), obj.year)
-
-
-def tx_day(day):
-    m = re.match(r"^(\d+)[^\d](\d+)[^\d](\d+)$", day)
-    if m:
-        return Day(m.group(2), MONTHS(int(m.group(1))), m.group(3))
-    else:
-        return get_today()
-
-
 class QuickCal(object):
     def init_holidays(self):
-        global HOLIDAYS
+        global CAL_HOLIDAYS
         local = sublime.load_settings("quickcal.sublime-settings").get("local", "en-US")
         holiday_list = join(CAL_EVENTS, "%d_%s.json" % (self.year, local))
         if self.force_update:
-            HOLIDAYS = {}
-        if self.year not in HOLIDAYS:
+            CAL_HOLIDAYS = {}
+        if self.year not in CAL_HOLIDAYS:
             if not exists(holiday_list):
                 html_file = "http://holidata.net/%s/%d.json" % (local, self.year)
                 try:
@@ -89,11 +97,11 @@ class QuickCal(object):
                 except:
                     return
             with open(holiday_list, 'r') as f:
-                HOLIDAYS[self.year] = json.loads("[%s]" % ','.join(f.readlines()))
+                CAL_HOLIDAYS[self.year] = json.loads("[%s]" % ','.join(f.readlines()))
 
     def list_holidays(self):
         bfr = ""
-        dates = HOLIDAYS.get(self.year, [])
+        dates = CAL_HOLIDAYS.get(self.year, [])
         target = "%4d-%02d-" % (self.year, self.month)
         for date in dates:
             if date["date"].startswith(target):
@@ -106,7 +114,7 @@ class QuickCal(object):
         return bfr
 
     def is_holiday(self, day):
-        dates = HOLIDAYS.get(self.year, [])
+        dates = CAL_HOLIDAYS.get(self.year, [])
         target = "%4d-%02d-%02d" % (self.year, self.month, day)
         for date in dates:
             if date["date"] == target and date["region"] in ["", sublime.load_settings("quickcal.sublime-settings").get("region", "")]:
@@ -117,11 +125,11 @@ class QuickCal(object):
         return ((self.year % 4 == 0) and (self.year % 100 != 0)) or (self.year % 400 == 0)
 
     def days_in_months(self):
-        days = 31
+        days = LONG_MONTH
         if self.month == MONTHS.February:
-            days = 29 if self.is_leap_year() else 28
+            days = FEB_LEAP_MONTH if self.is_leap_year() else FEB_MONTH
         elif self.month in [MONTHS.September, MONTHS.April, MONTHS.June, MONTHS.November]:
-            days = 30
+            days = SHORT_MONTH
         return days
 
     def show_calendar_row(self, first, last, empty_cells=(0, 0)):
@@ -167,9 +175,14 @@ class QuickCal(object):
         bfr += CAL_HEADER.format("%s %d" % (self.month, self.year))
         bfr += CAL_ROW_MID_DIV
         if self.sunday_first:
-            bfr += (CAL_HEADER_DAYS % ((str(WEEKDAYS.Sunday)[0:3],) + tuple(str(WEEKDAYS[x])[0:3] for x in range(0, 6))))
+            bfr += (
+                CAL_HEADER_DAYS % (
+                    (str(WEEKDAYS.Sunday)[0:CAL_COL_LENGTH],) +
+                    tuple(str(WEEKDAYS[x])[0:CAL_COL_LENGTH] for x in range(0, DAYS_IN_WEEK - 1))
+                )
+            )
         else:
-            bfr += (CAL_HEADER_DAYS % tuple(str(WEEKDAYS[x])[0:3] for x in range(0, 7)))
+            bfr += (CAL_HEADER_DAYS % tuple(str(WEEKDAYS[x])[0:CAL_COL_LENGTH] for x in range(0, DAYS_IN_WEEK)))
         return bfr
 
     def show_calendar_month(self, year, month, day=0, sunday_first=True, force_update=False):
@@ -185,30 +198,30 @@ class QuickCal(object):
         if sunday_first:
             offset = int(weekday_month_start) if weekday_month_start != WEEKDAYS.Sunday else 0
         else:
-            offset = int(weekday_month_start) - 1 if weekday_month_start != WEEKDAYS.Sunday else 6
+            offset = int(weekday_month_start) - 1 if weekday_month_start != WEEKDAYS.Sunday else DAYS_IN_WEEK - 1
 
         start_row = 0
-        if (num_days + offset) % 7:
-            end_row = (num_days + offset) / 7
-            end_offset = (7 * (end_row + 1)) - (num_days + offset)
+        if (num_days + offset) % DAYS_IN_WEEK:
+            end_row = (num_days + offset) / DAYS_IN_WEEK
+            end_offset = (DAYS_IN_WEEK * (end_row + 1)) - (num_days + offset)
         else:
-            end_row = ((num_days + offset) / 7) - 1
-            end_offset = (7 * end_row) - (num_days + offset)
+            end_row = ((num_days + offset) / DAYS_IN_WEEK) - 1
+            end_offset = (DAYS_IN_WEEK * end_row) - (num_days + offset)
 
         bfr = self.show_calendar_header()
         for r in range(0, int(end_row) + 1):
             bfr += CAL_ROW_MID_DIV
             if r == start_row and offset:
                 start = 1
-                end = 7 - offset + 1
+                end = DAYS_IN_WEEK - offset + 1
                 empty_cells = (offset, 0)
             elif r == end_row and end_offset:
-                start = 1 + 7 - offset + (7 * (r - 1))
+                start = 1 + DAYS_IN_WEEK - offset + (DAYS_IN_WEEK * (r - 1))
                 end = num_days + 1
                 empty_cells = (0, end_offset)
             else:
-                start = 1 + 7 - offset + (7 * (r - 1))
-                end = start + 7
+                start = 1 + DAYS_IN_WEEK - offset + (DAYS_IN_WEEK * (r - 1))
+                end = start + DAYS_IN_WEEK
                 empty_cells = (0, 0)
             bfr += self.show_calendar_row(start, end, empty_cells)
         bfr += CAL_ROW_BTM_DIV
@@ -313,6 +326,7 @@ class CalendarMonthNavCommand(sublime_plugin.TextCommand):
         year = current["year"] - 1 if previous == MONTHS.December else current["year"]
         day = today["day"] if today["month"] == str(previous) and year == today["year"] else 0
         return Day(day, previous, year)
+
 
 def plugin_loaded():
     global CAL_EVENTS
