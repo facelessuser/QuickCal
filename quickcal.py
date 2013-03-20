@@ -96,7 +96,7 @@ class QuickCal(object):
                     response = urllib.request.urlretrieve(html_file, holiday_list)
                 except:
                     return
-            with open(holiday_list, 'r') as f:
+            with open(holiday_list, 'r', encoding='utf-8') as f:
                 CAL_HOLIDAYS[self.year] = json.loads("[%s]" % ','.join(f.readlines()))
 
     def list_holidays(self):
