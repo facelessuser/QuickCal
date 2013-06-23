@@ -1,9 +1,9 @@
-#QuickCal
-<img src="http://dl.dropbox.com/u/342698/QuickCal/Example.png" border="0"/>
+# QuickCal
+![Example output](http://dl.dropbox.com/u/342698/QuickCal/Example.png "Example output")
 
 Sublime Text 3 plugin to show a month calendar
 
-#Settings
+# Settings
 These are the available settings at the current time:
 
 ```javascript
@@ -23,47 +23,13 @@ These are the available settings at the current time:
 }
 ```
 
-#Holidays
-Holidays are currently downloaded from holidata.net.  They are limited to about one year in advance of the current, and go back as far as 2011.  In the future the ability to import holidays from other sources may be added.
+# Holidays
+Holidays are currently downloaded from holidata.net.
+They are limited to about one year in advance of the current, and go back as far as 2011.
+In the future the ability to import holidays from other sources may be added.
 
-#Commands
-Here are the availabe commands.  Example keymap is seen below:
-
-```javascript
-    //////////////////////////////////////////////////////////////
-    // Calendar Shortcuts
-    //////////////////////////////////////////////////////////////
-    {
-        "keys": ["ctrl+super+alt+c"],
-        "command": "calendar"
-    },
-    {
-        "keys": ["ctrl+super+alt+shift+c"],
-        "command": "calendar_lookup"
-    },
-    {
-        "keys": ["alt+right"],
-        "command": "calendar_month_nav",
-        "context":
-        [
-            {
-                "key": "calendar_view"
-            }
-        ],
-        "args": {"reverse": false}
-    },
-    {
-        "keys": ["alt+left"],
-        "command": "calendar_month_nav",
-        "context":
-        [
-            {
-                "key": "calendar_view"
-            }
-        ],
-        "args": {"reverse": true}
-    },
-```
+# Commands
+Commands are accessible via the command palette.
 
 ##CalendarCommand
 Show todays date in the calendar (month view only)
