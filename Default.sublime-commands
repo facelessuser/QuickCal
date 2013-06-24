@@ -1,0 +1,32 @@
+[
+    {
+        "caption": "QuickCal: Show Calendar",
+        "command": "calendar"
+    }
+    ,{
+        "caption": "QuickCal: Lookup",
+        "command": "calendar_lookup"
+    }
+    ,{
+        "caption": "QuickCal: Next month",
+        "command": "calendar_month_nav",
+        "context":
+        [
+            {
+                "key": "calendar_view"
+            }
+        ],
+        "args": {"reverse": false}
+    }
+    ,{
+        "caption": "QuickCal: Prev month",
+        "command": "calendar_month_nav",
+        "context":
+        [
+            {
+                "key": "calendar_view"
+            }
+        ],
+        "args": {"reverse": true}
+    }
+]
