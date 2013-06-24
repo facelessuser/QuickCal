@@ -7,7 +7,7 @@ Copyright (c) 2012 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
 
-from datetime import date
+from datetime import date, datetime
 import sublime_plugin
 import sublime
 from QuickCal.lib.enum.enum import enum
@@ -21,10 +21,10 @@ MONTHS = enum("January February March April May June July August September Octob
 WEEKDAYS = enum("Monday Tuesday Wednesday Thursday Friday Saturday Sunday", start=1, name="Days")
 
 # Calendar display resources
-CAL_HEADER = "|{0:^69}|\n"
-CAL_ROW_TOP_DIV = "-----------------------------------------------------------------------\n"
-CAL_ROW_MID_DIV = "-----------------------------------------------------------------------\n"
-CAL_ROW_BTM_DIV = "-----------------------------------------------------------------------\n"
+CAL_HEADER = "   |{0:^69}|\n"
+CAL_ROW_TOP_DIV = "   -----------------------------------------------------------------------\n"
+CAL_ROW_MID_DIV = "   -----------------------------------------------------------------------\n"
+CAL_ROW_BTM_DIV = "   -----------------------------------------------------------------------\n"
 # (NO-BREAK SPACE) Unicode point U+00A0 or 0xC2A0: denoted with "."
 # "...{0: ^3}..."
 # "........."
@@ -39,7 +39,10 @@ CAL_CELL_OUTER = "         "
 CAL_CELL_EMPTY = "         "
 CAL_CELL_EMPTY_WALL = " "
 CAL_CELL_WALL = "|"
-CAL_HEADER_DAYS = "|   %s   |   %s   |   %s   |   %s   |   %s   |   %s   |   %s   |\n"
+CAL_NO_WEEK_NUM_WALL = "   |"
+CAL_WEEK_NUM_WALL = "%2d |"
+
+CAL_HEADER_DAYS = "   |   %s   |   %s   |   %s   |   %s   |   %s   |   %s   |   %s   |\n"
 CAL_COL_LENGTH = 3
 CAL_EVENTS = ""
 CAL_HOLIDAYS = {}
@@ -79,6 +82,12 @@ class Day(object):
         self.day = int(day)
         self.month = month
         self.year = int(year)
+        self._get_week()
+
+    def _get_week(self):
+        iso = not sublime.load_settings("quickcal.sublime-settings").get("sunday_first", True)
+        cal_day = datetime.strptime("%d-%d-%d" % (int(self.month), self.day, self.year), "%m-%d-%Y")
+        self.week = int(cal_day.strftime("%U")) if not iso else cal_day.isocalendar()[1]
 
     def __unicode__(self):
         return self.str
@@ -137,12 +146,15 @@ class QuickCal(object):
             days = SHORT_MONTH
         return days
 
-    def show_calendar_row(self, first, last, empty_cells=(0, 0)):
+    def show_calendar_row(self, first, last, week_no, empty_cells=(0, 0)):
         pos = enum("left center right")
         row = ""
 
         for p in pos:
-            row += CAL_CELL_WALL
+            if p == pos.center:
+                row += CAL_WEEK_NUM_WALL % week_no
+            else:
+                row += CAL_NO_WEEK_NUM_WALL
             if empty_cells[0] > 0:
                 row += (CAL_CELL_EMPTY * empty_cells[0]) + (CAL_CELL_EMPTY_WALL * (empty_cells[0] - 1))
                 row += CAL_CELL_WALL
@@ -190,12 +202,13 @@ class QuickCal(object):
             bfr += (CAL_HEADER_DAYS % tuple(str(WEEKDAYS[x])[0:CAL_COL_LENGTH] for x in range(0, DAYS_IN_WEEK)))
         return bfr
 
-    def show_calendar_month(self, year, month, day=0, sunday_first=True, force_update=False):
+    def show_calendar_month(self, year, month, day, sunday_first=True, force_update=False, no_show_day=False):
         self.year = year
         self.month = month
-        self.day = day
+        self.day = day if not no_show_day else 0
         self.sunday_first = sunday_first
         self.force_update = force_update
+        week_no = tx_day("%d-%d-%d" % (int(month), 1, year)).week
 
         self.init_holidays()
         num_days = self.days_in_months()
@@ -228,7 +241,8 @@ class QuickCal(object):
                 start = 1 + DAYS_IN_WEEK - offset + (DAYS_IN_WEEK * (r - 1))
                 end = start + DAYS_IN_WEEK
                 empty_cells = (0, 0)
-            bfr += self.show_calendar_row(start, end, empty_cells)
+            bfr += self.show_calendar_row(start, end, week_no, empty_cells)
+            week_no += 1
         bfr += CAL_ROW_BTM_DIV
 
         bfr += self.list_holidays()
@@ -299,6 +313,7 @@ class ShowCalendarCommand(sublime_plugin.TextCommand):
 
 class CalendarMonthNavCommand(sublime_plugin.TextCommand):
     def run(self, edit, reverse=False):
+        self.no_show_day = False
         current_month = self.view.settings().get("calendar_current", None)
         today = self.view.settings().get("calendar_today", None)
         if current_month is not None and today is not None:
@@ -311,7 +326,8 @@ class CalendarMonthNavCommand(sublime_plugin.TextCommand):
                     next.year,
                     next.month,
                     next.day,
-                    sunday_first=sublime.load_settings("quickcal.sublime-settings").get("sunday_first", True)
+                    sunday_first=sublime.load_settings("quickcal.sublime-settings").get("sunday_first", True),
+                    no_show_day = self.no_show_day
                 )
             )
             self.view.sel().clear()
@@ -322,14 +338,18 @@ class CalendarMonthNavCommand(sublime_plugin.TextCommand):
         m = MONTHS(current["month"])
         next = MONTHS(int(m) + 1) if m != MONTHS.December else MONTHS.January
         year = current["year"] + 1 if next == MONTHS.January else current["year"]
-        day = today["day"] if today["month"] == str(next) and year == today["year"] else 0
+        day = today["day"]
+        if not (today["month"] == str(next) and year == today["year"]):
+            self.no_show_day = True
         return Day(day, next, year)
 
     def previous(self, current, today):
         m = MONTHS(current["month"])
         previous = MONTHS(int(m) - 1) if m != MONTHS.January else MONTHS.December
         year = current["year"] - 1 if previous == MONTHS.December else current["year"]
-        day = today["day"] if today["month"] == str(previous) and year == today["year"] else 0
+        day = today["day"]
+        if not (today["month"] == str(previous) and year == today["year"]):
+            self.no_show_day = True
         return Day(day, previous, year)
 
 
