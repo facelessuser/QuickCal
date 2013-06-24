@@ -1,9 +1,14 @@
 #QuickCal
 <img src="http://dl.dropbox.com/u/342698/QuickCal/Example.png" border="0"/>
 
-Sublime Text 3 plugin to show a month calendar
+Sublime Text 3 plugin to show a simple month calendar.
 
-#Settings
+#Features
+- supports holidays downloaded from holidata.net
+- can show weeks starting with Monday or Sunday
+- shows week numbers for the year
+
+# Settings
 These are the available settings at the current time:
 
 ```javascript
@@ -23,58 +28,22 @@ These are the available settings at the current time:
 }
 ```
 
-#Holidays
+# Holidays
 Holidays are currently downloaded from holidata.net.  They are limited to about one year in advance of the current, and go back as far as 2011.  In the future the ability to import holidays from other sources may be added.
 
-#Commands
-Here are the availabe commands.  Example keymap is seen below:
+# Commands
+Calendar can be opened via commands from the command palette.  Once a calendar is shown, you can use the left and right arrow to navigate the months of the year.
 
-```javascript
-    //////////////////////////////////////////////////////////////
-    // Calendar Shortcuts
-    //////////////////////////////////////////////////////////////
-    {
-        "keys": ["ctrl+super+alt+c"],
-        "command": "calendar"
-    },
-    {
-        "keys": ["ctrl+super+alt+shift+c"],
-        "command": "calendar_lookup"
-    },
-    {
-        "keys": ["alt+right"],
-        "command": "calendar_month_nav",
-        "context":
-        [
-            {
-                "key": "calendar_view"
-            }
-        ],
-        "args": {"reverse": false}
-    },
-    {
-        "keys": ["alt+left"],
-        "command": "calendar_month_nav",
-        "context":
-        [
-            {
-                "key": "calendar_view"
-            }
-        ],
-        "args": {"reverse": true}
-    },
-```
-
-##CalendarCommand
+## CalendarCommand
 Show todays date in the calendar (month view only)
 
-##CalendarLookupCommand
+## CalendarLookupCommand
 Show an input panel allowing the user to define what day they would like to see in the calendar.  Input is entered month/day/year, where month, day, and year are numerical values.  Any non number delimter can be used, so things like ```3-2-2013``` is also acceptable.
 
-##CalendarMonthNavCommand
+## CalendarMonthNavCommand
 A command that can only be run in a calendar view.  It allows you to navigate to the next/previous month.  It takes directional option called reverse, which, if set to ```true```, navigates to the previous month.
 
-#Highlighting current days and holidays
+# Highlighting current days and holidays
 By default, color schemes for the calendar does not show the current day (or day of interest) highlighted, nor does it highlight the holidays.  You must update your color scheme file with something like the following:
 
 ```xml

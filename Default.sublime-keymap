@@ -1,0 +1,24 @@
+[
+    {
+        "keys": ["right"],
+        "command": "calendar_month_nav",
+        "context":
+        [
+            {
+                "key": "calendar_view"
+            }
+        ],
+        "args": {"reverse": false}
+    },
+    {
+        "keys": ["left"],
+        "command": "calendar_month_nav",
+        "context":
+        [
+            {
+                "key": "calendar_view"
+            }
+        ],
+        "args": {"reverse": true}
+    }
+]
