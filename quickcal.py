@@ -85,9 +85,17 @@ class Day(object):
         self._get_week()
 
     def _get_week(self):
-        iso = not sublime.load_settings("quickcal.sublime-settings").get("sunday_first", True)
+        sunday_first = sublime.load_settings("quickcal.sublime-settings").get("sunday_first", True)
         cal_day = datetime.strptime("%d-%d-%d" % (int(self.month), self.day, self.year), "%m-%d-%Y")
-        self.week = int(cal_day.strftime("%U")) if not iso else cal_day.isocalendar()[1]
+        week = int(cal_day.strftime("%U")) if sunday_first else cal_day.isocalendar()[1]
+        if sunday_first:
+            first_day = datetime.strptime("%d-%d-%d" % (1, 1, self.year), "%m-%d-%Y")
+            first_week = int(first_day.strftime("%U"))
+            if first_week == 0:
+                week += 1
+            if week > 52:
+                week = 1
+        self.week = week
 
     def __unicode__(self):
         return self.str
@@ -220,11 +228,11 @@ class QuickCal(object):
 
         start_row = 0
         if (num_days + offset) % DAYS_IN_WEEK:
-            end_row = (num_days + offset) / DAYS_IN_WEEK
-            end_offset = (DAYS_IN_WEEK * (end_row + 1)) - (num_days + offset)
+            end_row = int((num_days + offset) / DAYS_IN_WEEK)
+            end_offset = int((DAYS_IN_WEEK * (end_row + 1)) - (num_days + offset))
         else:
-            end_row = ((num_days + offset) / DAYS_IN_WEEK) - 1
-            end_offset = (DAYS_IN_WEEK * end_row) - (num_days + offset)
+            end_row = int(((num_days + offset) / DAYS_IN_WEEK) - 1)
+            end_offset = int((DAYS_IN_WEEK * end_row) - (num_days + offset))
 
         bfr = self.show_calendar_header()
         for r in range(0, int(end_row) + 1):
@@ -243,6 +251,8 @@ class QuickCal(object):
                 empty_cells = (0, 0)
             bfr += self.show_calendar_row(start, end, week_no, empty_cells)
             week_no += 1
+            if week_no == 53:
+                week_no = 1
         bfr += CAL_ROW_BTM_DIV
 
         bfr += self.list_holidays()
