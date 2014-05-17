@@ -1,4 +1,4 @@
- # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 """
 Calendar Viewer
@@ -115,7 +115,7 @@ class QuickCal(object):
             if not exists(holiday_list):
                 html_file = "http://holidata.net/%s/%d.json" % (locale, self.year)
                 try:
-                    response = urllib.request.urlretrieve(html_file, holiday_list)
+                    urllib.request.urlretrieve(html_file, holiday_list)
                 except:
                     return
             with open(holiday_list, 'r', encoding='utf-8') as f:
@@ -125,21 +125,21 @@ class QuickCal(object):
         bfr = ""
         dates = CAL_HOLIDAYS.get(self.year, [])
         target = "%4d-%02d-" % (self.year, self.month)
-        for date in dates:
-            if date["date"].startswith(target):
-                if date["region"] in ["", sublime.load_settings("quickcal.sublime-settings").get("region", "")]:
+        for d in dates:
+            if d["date"].startswith(target):
+                if d["region"] in ["", sublime.load_settings("quickcal.sublime-settings").get("region", "")]:
                     bfr += "* %s: %s %s\n" % (
-                        date["date"],
-                        date["description"],
-                        "(Region: %s)" % date["region"] if date["region"] != "" else ""
+                        d["date"],
+                        d["description"],
+                        "(Region: %s)" % d["region"] if d["region"] != "" else ""
                     )
         return bfr
 
     def is_holiday(self, day):
         dates = CAL_HOLIDAYS.get(self.year, [])
         target = "%4d-%02d-%02d" % (self.year, self.month, day)
-        for date in dates:
-            if date["date"] == target and date["region"] in ["", sublime.load_settings("quickcal.sublime-settings").get("region", "")]:
+        for d in dates:
+            if d["date"] == target and d["region"] in ["", sublime.load_settings("quickcal.sublime-settings").get("region", "")]:
                 return True
         return False
 
@@ -337,7 +337,7 @@ class CalendarMonthNavCommand(sublime_plugin.TextCommand):
                     next.month,
                     next.day,
                     sunday_first=sublime.load_settings("quickcal.sublime-settings").get("sunday_first", True),
-                    no_show_day = self.no_show_day
+                    no_show_day=self.no_show_day
                 )
             )
             self.view.sel().clear()
