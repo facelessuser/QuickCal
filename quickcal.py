@@ -17,6 +17,8 @@ from os import makedirs
 import json
 import urllib.request
 
+USE_ST_SYNTAX = int(sublime.version()) >= 3084
+ST_SYNTAX = "sublime-syntax" if USE_ST_SYNTAX else 'tmLanguage'
 MONTHS = enum("January February March April May June July August September October November December", start=1, name="Months")
 WEEKDAYS = enum("Monday Tuesday Wednesday Thursday Friday Saturday Sunday", start=1, name="Days")
 
@@ -312,7 +314,7 @@ class ShowCalendarCommand(sublime_plugin.TextCommand):
             sunday_first=sublime.load_settings("quickcal.sublime-settings").get("sunday_first", True),
             force_update=True
         )
-        view.set_syntax_file("Packages/QuickCal/Calendar.tmLanguage")
+        view.set_syntax_file("Packages/QuickCal/Calendar.%s" % ST_SYNTAX)
         view.replace(edit, sublime.Region(0, view.size()), bfr)
         view.sel().clear()
         view.settings().set("calendar_current", {"month": str(today.month), "year": today.year})
