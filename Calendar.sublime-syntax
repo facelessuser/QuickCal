@@ -2,8 +2,8 @@
 ---
 # http://www.sublimetext.com/docs/3/syntax.html
 name: Calendar
-file_extensions:
-  - calendar
+file_extensions: []
+hidden: true
 scope: source.calendar
 contexts:
   main:
