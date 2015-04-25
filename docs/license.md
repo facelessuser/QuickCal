@@ -1,4 +1,7 @@
-# License
+# License {: .doctitle}
+
+---
+
 QuickCal is released under the MIT license.
 
 Copyright (c) 2012 - 2015 Isaac Muse <isaacmuse@gmail.com>
