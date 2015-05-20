@@ -1,6 +1,5 @@
 # QuickCal {: .doctitle}
 Sublime Text plugin for viewing a quick, simple month calendar.
-{: .doctitle-info}
 
 ---
 

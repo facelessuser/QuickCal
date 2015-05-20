@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-
 """
-Calendar Viewer
+Calendar Viewer.
 
-Copyright (c) 2012 Isaac Muse <isaacmuse@gmail.com>
+Copyright (c) 2012 - 2015 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
 
@@ -19,8 +18,14 @@ import urllib.request
 
 USE_ST_SYNTAX = int(sublime.version()) >= 3084 and False
 ST_SYNTAX = "sublime-syntax" if USE_ST_SYNTAX else 'tmLanguage'
-MONTHS = enum("January February March April May June July August September October November December", start=1, name="Months")
-WEEKDAYS = enum("Monday Tuesday Wednesday Thursday Friday Saturday Sunday", start=1, name="Days")
+MONTHS = enum(
+    "January February March April May June July August September October November December",
+    start=1, name="Months"
+)
+WEEKDAYS = enum(
+    "Monday Tuesday Wednesday Thursday Friday Saturday Sunday",
+    start=1, name="Days"
+)
 
 # Calendar display resources
 CAL_HEADER = "   |{0:^69}|\n"
@@ -59,11 +64,15 @@ DAYS_IN_WEEK = 7
 
 
 def get_today():
+    """Get today."""
+
     obj = date.today()
     return Day(obj.day, MONTHS(obj.month), obj.year)
 
 
 def tx_day(day):
+    """Translate day object."""
+
     m = re.match(r"^(\d+)[^\d](\d+)[^\d](\d+)$", day)
     if m:
         return Day(m.group(2), MONTHS(int(m.group(1))), m.group(3))
@@ -72,21 +81,36 @@ def tx_day(day):
 
 
 class CalendarEventListener(sublime_plugin.EventListener):
+
+    """Listen for Calendar shortcuts."""
+
     def on_query_context(self, view, key, operator, operand, match_all):
-        if view.settings().get("calendar_current", None) is not None and view.settings().get("calendar_today", None) is not None:
+        """Handle Calendar shortcuts."""
+
+        if (
+            view.settings().get("calendar_current", None) is not None and
+            view.settings().get("calendar_today", None) is not None
+        ):
             if key == "calendar_view":
                 return True
         return False
 
 
 class Day(object):
+
+    """Day object."""
+
     def __init__(self, day, month, year):
+        """Initialize."""
+
         self.day = int(day)
         self.month = month
         self.year = int(year)
         self._get_week()
 
     def _get_week(self):
+        """Get week number."""
+
         sunday_first = sublime.load_settings("quickcal.sublime-settings").get("sunday_first", True)
         cal_day = datetime.strptime("%d-%d-%d" % (int(self.month), self.day, self.year), "%m-%d-%Y")
         week = int(cal_day.strftime("%U")) if sunday_first else cal_day.isocalendar()[1]
@@ -100,14 +124,23 @@ class Day(object):
         self.week = week
 
     def __unicode__(self):
+        """Convert to unicode."""
+
         return self.str
 
     def __str__(self):
+        """Convert to string representation."""
+
         return ("%d/%d/%d" % (self.month.value, self.day, self.year))
 
 
 class QuickCal(object):
+
+    """Quickcal."""
+
     def init_holidays(self):
+        """Initialize holidays."""
+
         global CAL_HOLIDAYS
         locale = sublime.load_settings("quickcal.sublime-settings").get("locale", "en-US")
         holiday_list = join(CAL_EVENTS, "%d_%s.json" % (self.year, locale))
@@ -118,12 +151,14 @@ class QuickCal(object):
                 html_file = "http://holidata.net/%s/%d.json" % (locale, self.year)
                 try:
                     urllib.request.urlretrieve(html_file, holiday_list)
-                except:
+                except Exception:
                     return
             with open(holiday_list, 'r', encoding='utf-8') as f:
                 CAL_HOLIDAYS[self.year] = json.loads("[%s]" % ','.join(f.readlines()))
 
     def list_holidays(self):
+        """List the holidays."""
+
         bfr = ""
         dates = CAL_HOLIDAYS.get(self.year, [])
         target = "%4d-%02d-" % (self.year, self.month)
@@ -138,17 +173,26 @@ class QuickCal(object):
         return bfr
 
     def is_holiday(self, day):
+        """Check if is a holiday."""
+
         dates = CAL_HOLIDAYS.get(self.year, [])
         target = "%4d-%02d-%02d" % (self.year, self.month, day)
         for d in dates:
-            if d["date"] == target and d["region"] in ["", sublime.load_settings("quickcal.sublime-settings").get("region", "")]:
+            if (
+                d["date"] == target and
+                d["region"] in ["", sublime.load_settings("quickcal.sublime-settings").get("region", "")]
+            ):
                 return True
         return False
 
     def is_leap_year(self):
+        """Check if this is a leap year."""
+
         return ((self.year % 4 == 0) and (self.year % 100 != 0)) or (self.year % 400 == 0)
 
     def days_in_months(self):
+        """Get days in the month."""
+
         days = LONG_MONTH
         if self.month == MONTHS.February:
             days = FEB_LEAP_MONTH if self.is_leap_year() else FEB_MONTH
@@ -157,6 +201,8 @@ class QuickCal(object):
         return days
 
     def show_calendar_row(self, first, last, week_no, empty_cells=(0, 0)):
+        """Show calendar row."""
+
         pos = enum("left center right")
         row = ""
 
@@ -198,6 +244,8 @@ class QuickCal(object):
         return row
 
     def show_calendar_header(self):
+        """Show calendar header."""
+
         bfr = CAL_ROW_TOP_DIV
         bfr += CAL_HEADER.format("%s %d" % (self.month, self.year))
         bfr += CAL_ROW_MID_DIV
@@ -213,6 +261,8 @@ class QuickCal(object):
         return bfr
 
     def show_calendar_month(self, year, month, day, sunday_first=True, force_update=False, no_show_day=False):
+        """Show calendar month."""
+
         self.year = year
         self.month = month
         self.day = day if not no_show_day else 0
@@ -262,7 +312,12 @@ class QuickCal(object):
 
 
 class CalendarLookupCommand(sublime_plugin.WindowCommand):
+
+    """Lookup calendar by date from input panel."""
+
     def lookup(self, value):
+        """Send day if it matches day pattern."""
+
         if value != "":
             m = re.match(r"^(\d+)[^\d](\d+)[^\d](\d+)$", value)
             if m:
@@ -271,6 +326,8 @@ class CalendarLookupCommand(sublime_plugin.WindowCommand):
                     win.run_command("calendar", {"day": value})
 
     def run(self):
+        """Run command."""
+
         today = get_today()
         # Ask for date
         v = self.window.show_input_panel(
@@ -284,7 +341,12 @@ class CalendarLookupCommand(sublime_plugin.WindowCommand):
 
 
 class CalendarCommand(sublime_plugin.WindowCommand):
+
+    """Show calendar at specific day if provided."""
+
     def run(self, day=None):
+        """Run command."""
+
         calendar_view_exists = False
         for v in self.window.views():
             if v.settings().get("calendar_today", None) is not None:
@@ -304,7 +366,12 @@ class CalendarCommand(sublime_plugin.WindowCommand):
 
 
 class ShowCalendarCommand(sublime_plugin.TextCommand):
+
+    """Show the calendar."""
+
     def run(self, edit, day):
+        """Run command."""
+
         view = self.view
         today = get_today() if day is None else tx_day(day)
         bfr = QCAL.show_calendar_month(
@@ -324,48 +391,59 @@ class ShowCalendarCommand(sublime_plugin.TextCommand):
 
 
 class CalendarMonthNavCommand(sublime_plugin.TextCommand):
+
+    """Navigate through the months."""
+
     def run(self, edit, reverse=False):
+        """Run command."""
+
         self.no_show_day = False
         current_month = self.view.settings().get("calendar_current", None)
         today = self.view.settings().get("calendar_today", None)
         if current_month is not None and today is not None:
             self.view.set_read_only(False)
-            next = self.next(current_month, today) if not reverse else self.previous(current_month, today)
+            next_date = self.next(current_month, today) if not reverse else self.previous(current_month, today)
             self.view.replace(
                 edit,
                 sublime.Region(0, self.view.size()),
                 QCAL.show_calendar_month(
-                    next.year,
-                    next.month,
-                    next.day,
+                    next_date.year,
+                    next_date.month,
+                    next_date.day,
                     sunday_first=sublime.load_settings("quickcal.sublime-settings").get("sunday_first", True),
                     no_show_day=self.no_show_day
                 )
             )
             self.view.sel().clear()
-            self.view.settings().set("calendar_current", {"month": str(next.month), "year": next.year})
+            self.view.settings().set("calendar_current", {"month": str(next_date.month), "year": next_date.year})
             self.view.set_read_only(True)
 
     def next(self, current, today):
+        """Get next month."""
+
         m = MONTHS(current["month"])
-        next = MONTHS(int(m) + 1) if m != MONTHS.December else MONTHS.January
-        year = current["year"] + 1 if next == MONTHS.January else current["year"]
+        next_month = MONTHS(int(m) + 1) if m != MONTHS.December else MONTHS.January
+        year = current["year"] + 1 if next_month == MONTHS.January else current["year"]
         day = today["day"]
-        if not (today["month"] == str(next) and year == today["year"]):
+        if not (today["month"] == str(next_month) and year == today["year"]):
             self.no_show_day = True
-        return Day(day, next, year)
+        return Day(day, next_month, year)
 
     def previous(self, current, today):
+        """Get previous month."""
+
         m = MONTHS(current["month"])
-        previous = MONTHS(int(m) - 1) if m != MONTHS.January else MONTHS.December
-        year = current["year"] - 1 if previous == MONTHS.December else current["year"]
+        prev_month = MONTHS(int(m) - 1) if m != MONTHS.January else MONTHS.December
+        year = current["year"] - 1 if prev_month == MONTHS.December else current["year"]
         day = today["day"]
-        if not (today["month"] == str(previous) and year == today["year"]):
+        if not (today["month"] == str(prev_month) and year == today["year"]):
             self.no_show_day = True
-        return Day(day, previous, year)
+        return Day(day, prev_month, year)
 
 
 def plugin_loaded():
+    """Setup plugin."""
+
     global CAL_EVENTS
     global QCAL
     QCAL = QuickCal()
