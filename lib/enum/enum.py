@@ -6,7 +6,7 @@ License: MIT
 """
 # pylint: disable=protected-access
 
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 import operator
 from .immutable import Immutable
 
@@ -147,7 +147,7 @@ def _enum_factory(symbols, start, name):
 
         if isinstance(sequence, dict):
             assert len(sequence) == len(set(sequence.values()))
-            for k, v in sorted(sequence.iteritems(), key=operator.itemgetter(1)):
+            for k, v in sorted(sequence.items(), key=operator.itemgetter(1)):
                 yield k, v
         else:
             n = start
@@ -169,7 +169,7 @@ def _enum_factory(symbols, start, name):
         def __reduce__(self):
             """Reduce for when pickling."""
 
-            d = self._asdict()
+            d = OrderedDict(zip(self._fields, self))
             e = d[self._fields[0]]
             for k, v in d.items():
                 d[k] = v.value
