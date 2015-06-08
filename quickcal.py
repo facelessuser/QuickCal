@@ -16,7 +16,7 @@ from os import makedirs
 import json
 import urllib.request
 
-USE_ST_SYNTAX = int(sublime.version()) >= 3084 and False
+USE_ST_SYNTAX = int(sublime.version()) >= 3092
 ST_SYNTAX = "sublime-syntax" if USE_ST_SYNTAX else 'tmLanguage'
 MONTHS = enum(
     "January February March April May June July August September October November December",
