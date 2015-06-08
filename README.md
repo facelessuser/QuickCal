@@ -6,9 +6,9 @@
 Sublime Text plugin for viewing a quick, simple month calendar.
 
 # Features
-- supports holidays downloaded from holidata.net
-- can show weeks starting with Monday or Sunday
-- shows week numbers for the year
+- Supports holidays downloaded from holidata.net.
+- Can show weeks starting with Monday or Sunday.
+- Shows week numbers for the year.
 
 # Documentation
 http://facelessuser.github.io/QuickCal/
