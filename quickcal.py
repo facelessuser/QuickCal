@@ -153,8 +153,12 @@ class QuickCal(object):
                     urllib.request.urlretrieve(html_file, holiday_list)
                 except Exception:
                     return
-            with open(holiday_list, 'r', encoding='utf-8') as f:
-                CAL_HOLIDAYS[self.year] = json.loads("[%s]" % ','.join(f.readlines()))
+            try:
+                with open(holiday_list, 'r', encoding='utf-8') as f:
+                    CAL_HOLIDAYS[self.year] = json.loads("[%s]" % ','.join(f.readlines()))
+            except Exception:
+                # Failed to read holidays
+                pass
 
     def list_holidays(self):
         """List the holidays."""
