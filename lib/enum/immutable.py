@@ -7,7 +7,6 @@ License: MIT
 
 
 class Immutable(object):
-
     """Make class immutable."""
 
     def __init__(self, *args, **kwargs):

@@ -81,7 +81,6 @@ def tx_day(day):
 
 
 class CalendarEventListener(sublime_plugin.EventListener):
-
     """Listen for Calendar shortcuts."""
 
     def on_query_context(self, view, key, operator, operand, match_all):
@@ -97,7 +96,6 @@ class CalendarEventListener(sublime_plugin.EventListener):
 
 
 class Day(object):
-
     """Day object."""
 
     def __init__(self, day, month, year):
@@ -135,7 +133,6 @@ class Day(object):
 
 
 class QuickCal(object):
-
     """Quickcal."""
 
     def init_holidays(self):
@@ -316,7 +313,6 @@ class QuickCal(object):
 
 
 class CalendarLookupCommand(sublime_plugin.WindowCommand):
-
     """Lookup calendar by date from input panel."""
 
     def lookup(self, value):
@@ -345,7 +341,6 @@ class CalendarLookupCommand(sublime_plugin.WindowCommand):
 
 
 class CalendarCommand(sublime_plugin.WindowCommand):
-
     """Show calendar at specific day if provided."""
 
     def run(self, day=None):
@@ -370,7 +365,6 @@ class CalendarCommand(sublime_plugin.WindowCommand):
 
 
 class ShowCalendarCommand(sublime_plugin.TextCommand):
-
     """Show the calendar."""
 
     def run(self, edit, day):
@@ -395,7 +389,6 @@ class ShowCalendarCommand(sublime_plugin.TextCommand):
 
 
 class CalendarMonthNavCommand(sublime_plugin.TextCommand):
-
     """Navigate through the months."""
 
     def run(self, edit, reverse=False):

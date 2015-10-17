@@ -5,7 +5,6 @@ import pickle
 
 
 class TestEnum(unittest.TestCase):
-
     """Test enum."""
 
     days1 = enum.enum("Monday Tuesday Wednesday Thursday Friday Saturday Sunday")

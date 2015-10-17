@@ -57,7 +57,6 @@ def _enumvalue_factory(symbol, value, enumset, enumsetid):
     properties = {"_enumset": enumset, "_enumsetid": enumsetid, "_enumtype": _ENUM_VALUE}
 
     class EnumValue(namedtuple('enumvalue', ("name", "value")), Immutable):
-
         """EnumValue class."""
 
         def __str__(self):
@@ -163,7 +162,6 @@ def _enum_factory(symbols, start, name):
         return [_enumvalue_factory(e[0], e[1], setname, enumsetid) for e in enums]
 
     class EnumSet(namedtuple('enum', symbols), Immutable):
-
         """EnumSet class."""
 
         def __reduce__(self):
