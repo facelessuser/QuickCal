@@ -11,10 +11,11 @@ import sublime_plugin
 import sublime
 from QuickCal.lib.enum.enum import enum
 import re
+import os
 from os.path import join, exists
-from os import makedirs
 import json
 import urllib.request
+from QuickCal.lib import calendarevents
 
 USE_ST_SYNTAX = int(sublime.version()) >= 3092
 ST_SYNTAX = "sublime-syntax" if USE_ST_SYNTAX else 'tmLanguage'
@@ -138,12 +139,29 @@ class QuickCal(object):
     def init_holidays(self):
         """Initialize holidays."""
 
+        settings = sublime.load_settings("quickcal.sublime-settings")
+        offline = settings.get('offline_holidays')
+        if offline:
+            self.offline_holidays(settings)
+        else:
+            self.online_holidays(settings)
+
+    def online_holidays(self, settings):
+        """Generate holidays via holidata.net plus custom holidays."""
+
         global CAL_HOLIDAYS
-        locale = sublime.load_settings("quickcal.sublime-settings").get("locale", "en-US")
+        locale = settings.get("locale", "en-US")
+        custom = settings.get('custom_holidays')
         holiday_list = join(CAL_EVENTS, "%d_%s.json" % (self.year, locale))
         if self.force_update:
             CAL_HOLIDAYS = {}
         if self.year not in CAL_HOLIDAYS:
+            h_days = calendarevents.Holidays(self.year)
+            for h in custom:
+                try:
+                    h_days.add_holiday(h['name'], h['date'])
+                except Exception:
+                    pass
             if not exists(holiday_list):
                 html_file = "http://holidata.net/%s/%d.json" % (locale, self.year)
                 try:
@@ -155,7 +173,49 @@ class QuickCal(object):
                     CAL_HOLIDAYS[self.year] = json.loads("[%s]" % ','.join(f.readlines()))
             except Exception:
                 # Failed to read holidays
-                pass
+                CAL_HOLIDAYS[self.year] = []
+                if exists(holiday_list):
+                    try:
+                        os.remove(holiday_list)
+                    except Exception:
+                        pass
+            for h in h_days.get_all():
+                if h.date is not None:
+                    CAL_HOLIDAYS[self.year].append({"date": str(h.date), "description": h.name, "region": ""})
+            CAL_HOLIDAYS[self.year].sort(key=lambda x: x["date"])
+
+    def offline_holidays(self, settings):
+        """Generate holidays internally via calendarevents plus custom holidays."""
+
+        global CAL_HOLIDAYS
+        custom = settings.get('custom_holidays')
+        default_lists = settings.get('default_holiday_lists', {})
+        if self.force_update:
+            CAL_HOLIDAYS = {}
+        if self.year not in CAL_HOLIDAYS:
+            h_days = calendarevents.Holidays(self.year)
+            if default_lists.get('christian', False):
+                h_days.add_holidays(calendarevents.christian_holidays.holidays)
+            if default_lists.get('daylight_savings', False):
+                h_days.add_holidays(calendarevents.dst_holidays.holidays)
+            if default_lists.get('common_us', False):
+                h_days.add_holidays(calendarevents.common_observance_holidays.holidays)
+            if default_lists.get('federal_us', False):
+                h_days.add_holidays(calendarevents.federal_holidays.holidays)
+            if default_lists.get('important_us', False):
+                h_days.add_holidays(calendarevents.important_observance_holidays.holidays)
+            if default_lists.get('other_us', False):
+                h_days.add_holidays(calendarevents.other_observance_holidays.holidays)
+            for h in custom:
+                try:
+                    h_days.add_holiday(h['name'], h['date'])
+                except Exception:
+                    pass
+            CAL_HOLIDAYS[self.year] = []
+            for h in h_days.get_all():
+                if h.date is not None:
+                    CAL_HOLIDAYS[self.year].append({"date": str(h.date), "description": h.name, "region": ""})
+            CAL_HOLIDAYS[self.year].sort(key=lambda x: x["date"])
 
     def list_holidays(self):
         """List the holidays."""
@@ -446,4 +506,4 @@ def plugin_loaded():
     QCAL = QuickCal()
     CAL_EVENTS = join(sublime.packages_path(), "User", "CalendarEvents")
     if not exists(CAL_EVENTS):
-        makedirs(CAL_EVENTS)
+        os.makedirs(CAL_EVENTS)

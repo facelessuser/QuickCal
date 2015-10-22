@@ -10,5 +10,27 @@
     "region": "",
 
     // Start with Sunday first when displaying calendar
-    "sunday_first": true
+    "sunday_first": true,
+
+    // Don't download from http://holidata.net, but instead use interal holiday generator.
+    // Note: currently only US holidays are supported.
+    "offline_holidays": false,
+
+    // Default internal holiday lists
+    "default_holiday_lists": {
+        "christian": false,          // Christian (a lot are specifically Catholic)
+        "daylight_savings": true,    // Daylight Savings
+        "common_us": false,          // Common US holidays
+        "federal_us": true,          // US federal holidays
+        "important_us": true,        // Important US holidays
+        "other_us": false            // Other random holidays
+    },
+
+    // Add simple custom holidays.  Should be an array of dictionaries.
+    "custom_holidays": [
+        // Should be in the following form:
+        //    name: is a unique name for the holiday
+        //    date: is an array of two integers: [month, day]
+        // {"name": "Bob's Birthday", "date": [2, 20]}
+    ]
 }
