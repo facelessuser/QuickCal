@@ -204,8 +204,12 @@ class QuickCal(object):
                 h_days.add_holidays(calendarevents.federal_holidays.holidays)
             if default_lists.get('important_us', False):
                 h_days.add_holidays(calendarevents.important_observance_holidays.holidays)
+            if default_lists.get('state_birthdays_us', False):
+                h_days.add_holidays(calendarevents.us_state_birthday_holidays.holidays)
             if default_lists.get('other_us', False):
                 h_days.add_holidays(calendarevents.other_observance_holidays.holidays)
+            if default_lists.get('world_wide', False):
+                h_days.add_holidays(calendarevents.world_wide_observance_holidays.holidays)
             for h in custom:
                 try:
                     h_days.add_holiday(h['name'], h['date'])
@@ -484,6 +488,7 @@ class CalendarMonthNavCommand(sublime_plugin.TextCommand):
         day = today["day"]
         if not (today["month"] == str(next_month) and year == today["year"]):
             self.no_show_day = True
+            day = 1
         return Day(day, next_month, year)
 
     def previous(self, current, today):
@@ -495,6 +500,7 @@ class CalendarMonthNavCommand(sublime_plugin.TextCommand):
         day = today["day"]
         if not (today["month"] == str(prev_month) and year == today["year"]):
             self.no_show_day = True
+            day = 1
         return Day(day, prev_month, year)
 
 

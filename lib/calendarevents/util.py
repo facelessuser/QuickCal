@@ -67,3 +67,9 @@ def last_day_in_month(year, month, weekday):
     while my_date.weekday() != weekday:
         my_date -= timedelta(days=1)
     return my_date
+
+
+def is_leap_year(year):
+    """Get leap year."""
+
+    return (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0)

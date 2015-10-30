@@ -28,6 +28,8 @@ from . import important_observance_holidays
 from . import federal_holidays
 from . import dst_holidays
 from . import other_observance_holidays
+from . import world_wide_observance_holidays
+from . import us_state_birthday_holidays
 import re
 
 WORD_CHARS = re.compile('\w', re.UNICODE)
@@ -120,6 +122,8 @@ def test():
     my_holidays.add_holidays(federal_holidays.holidays)
     my_holidays.add_holidays(important_observance_holidays.holidays)
     my_holidays.add_holidays(other_observance_holidays.holidays)
+    my_holidays.add_holidays(world_wide_observance_holidays.holidays)
+    my_holidays.add_holidays(us_state_birthday_holidays.holidays)
     print('---- Now ----')
     for day in my_holidays.get_all():
         if day.date is None:

@@ -1,0 +1,2 @@
+.\lib\calendarevents\util.py:74:1: W293 blank line contains whitespace
+.\lib\calendarevents\world_wide_observance_holidays.py:159:1: F811 redefinition of unused 'get_international_programmers_day_worldwide' from line 35

@@ -74,12 +74,6 @@ def get_christmas_eve(year):
     return christian_holidays.get_christmas_eve(year)
 
 
-def get_day_after_christmas(year):
-    """Get Day After Christmas (December 26th)."""
-
-    return date(year, util.DEC, 26)
-
-
 def get_new_years_eve(year):
     """Get New Year's Eve."""
 
@@ -95,6 +89,5 @@ holidays = {
     "Easter Sunday": get_easter_sunday,
     "Halloween Day": get_halloween,
     "Christmas Eve": get_christmas_eve,
-    "Day After Christmas": get_day_after_christmas,
     "New Year's Eve": get_new_years_eve
 }

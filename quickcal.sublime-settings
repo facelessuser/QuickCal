@@ -23,7 +23,9 @@
         "common_us": false,          // Common US holidays
         "federal_us": true,          // US federal holidays
         "important_us": true,        // Important US holidays
-        "other_us": false            // Other random holidays
+        "state_birthdays_us": false, // State birthdays US holidays
+        "other_us": false,           // Other random holidays
+        "world_wide": false          // World wide holidays
     },
 
     // Add simple custom holidays.  Should be an array of dictionaries.
