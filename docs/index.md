@@ -12,3 +12,7 @@ View and navigate through a calendar my months.
 - Supports holidays downloaded from holidata.net.
 - Can show weeks starting with Monday or Sunday.
 - Shows week numbers for the year.
+
+# Thanks
+
+- [@kauinoa](https://github.com/kauinoa): [calendarevents](https://github.com/kauinoa/CalendarEvents)

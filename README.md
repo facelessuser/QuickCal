@@ -14,7 +14,8 @@ Sublime Text plugin for viewing a quick, simple month calendar.
 http://facelessuser.github.io/QuickCal/
 
 # Thanks
-@kauinoa - calendarevents
+
+- [@kauinoa](https://github.com/kauinoa): [calendarevents](https://github.com/kauinoa/CalendarEvents)
 
 # License
 QuickCal is released under the MIT license.
