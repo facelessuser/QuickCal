@@ -1,0 +1,11 @@
+{
+    "*": {
+        ">=3000": [
+            "pygments",
+            "markdown",
+            "mdpopups",
+            "jinja2",
+            "markupsafe"
+        ]
+    }
+}

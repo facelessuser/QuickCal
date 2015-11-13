@@ -16,6 +16,13 @@ from os.path import join, exists
 import json
 import urllib.request
 from QuickCal.lib import calendarevents
+import copy
+
+TOOLTIP_SUPPORT = int(sublime.version()) >= 3072
+
+if TOOLTIP_SUPPORT:
+    import mdpopups
+    import time
 
 USE_ST_SYNTAX = int(sublime.version()) >= 3092
 ST_SYNTAX = "sublime-syntax" if USE_ST_SYNTAX else 'tmLanguage'
@@ -229,7 +236,7 @@ class QuickCal(object):
         target = "%4d-%02d-" % (self.year, self.month)
         for d in dates:
             if d["date"].startswith(target):
-                if d["region"] in ["", sublime.load_settings("quickcal.sublime-settings").get("region", "")]:
+                if d["region"] in self.region:
                     bfr += "* %s: %s %s\n" % (
                         d["date"],
                         d["description"],
@@ -245,7 +252,7 @@ class QuickCal(object):
         for d in dates:
             if (
                 d["date"] == target and
-                d["region"] in ["", sublime.load_settings("quickcal.sublime-settings").get("region", "")]
+                d["region"] in self.region
             ):
                 return True
         return False
@@ -333,6 +340,8 @@ class QuickCal(object):
         self.day = day if not no_show_day else 0
         self.sunday_first = sunday_first
         self.force_update = force_update
+        self.day_map = {}
+        self.region = ("", sublime.load_settings("quickcal.sublime-settings").get("region", ""))
         week_no = tx_day("%d-%d-%d" % (int(month), 1, year)).week
 
         self.init_holidays()
@@ -358,14 +367,17 @@ class QuickCal(object):
                 start = 1
                 end = DAYS_IN_WEEK - offset + 1
                 empty_cells = (offset, 0)
+                self.day_map[r] = empty_cells
             elif r == end_row and end_offset:
                 start = 1 + DAYS_IN_WEEK - offset + (DAYS_IN_WEEK * (r - 1))
                 end = num_days + 1
                 empty_cells = (0, end_offset)
+                self.day_map[r] = empty_cells
             else:
                 start = 1 + DAYS_IN_WEEK - offset + (DAYS_IN_WEEK * (r - 1))
                 end = start + DAYS_IN_WEEK
                 empty_cells = (0, 0)
+                self.day_map[r] = empty_cells
             bfr += self.show_calendar_row(start, end, week_no, empty_cells)
             week_no += 1
             if week_no == 53:
@@ -428,6 +440,75 @@ class CalendarCommand(sublime_plugin.WindowCommand):
         view.run_command("show_calendar", {"day": day})
 
 
+class CalendarListener(sublime_plugin.EventListener):
+    """Show holiday tooltips."""
+
+    last = None
+
+    def on_selection_modified(self, view):
+        """Find and display popup of special day."""
+
+        if not TOOLTIP_SUPPORT or (self.last is not None and (time.time() - self.last) < 1):
+            return
+
+        current_month = view.settings().get("calendar_current", None)
+        if current_month is not None:
+            sel = view.sel()
+            if len(sel):
+                s = sel[0]
+                if s.size() == 0:
+                    is_special = view.score_selector(
+                        s.a,
+                        'holiday.calendar, selected_day.calendar'
+                    )
+                    center = None
+                    if is_special:
+                        row, col = view.rowcol(s.a)
+                        pt1 = view.text_point(row - 1, col)
+                        top_special = view.score_selector(
+                            pt1,
+                            'holiday.calendar'
+                        )
+                        pt2 = view.text_point(row + 1, col)
+                        bottom_special = view.score_selector(
+                            pt2,
+                            'holiday.calendar'
+                        )
+
+                        if top_special or bottom_special:
+                            if top_special and not bottom_special:
+                                center = pt1
+                            elif bottom_special and not top_special:
+                                center = pt2
+                            else:
+                                center = s.a
+
+                            m = re.search(r'(\d+)', view.substr(view.extract_scope(center)))
+                            day = m.group(1)
+
+                            self.get_holidays(
+                                view, int(day), int(MONTHS(current_month['month'])), current_month['year']
+                            )
+
+    def get_holidays(self, view, day, month, year):
+        """Get the holidays for the given day."""
+
+        bfr = ''
+        target = "%4d-%02d-%02d" % (year, month, day)
+        region = ("", sublime.load_settings("quickcal.sublime-settings").get("region", ""))
+        for d in view.settings().get('calendar_holidays', []):
+            if d['date'] == target:
+                if d["region"] in region:
+                    bfr += "* %s: %s %s\n" % (
+                        d["date"],
+                        d["description"],
+                        "(Region: %s)" % d["region"] if d["region"] != "" else ""
+                    )
+
+        mdpopups.show_popup(view, '## Holidays\n' + bfr)
+        self.last = time.time()
+
+
 class ShowCalendarCommand(sublime_plugin.TextCommand):
     """Show the calendar."""
 
@@ -443,6 +524,7 @@ class ShowCalendarCommand(sublime_plugin.TextCommand):
             sunday_first=sublime.load_settings("quickcal.sublime-settings").get("sunday_first", True),
             force_update=True
         )
+        view.settings().set('calendar_holidays', copy.deepcopy(CAL_HOLIDAYS.get(today.year, [])))
         view.set_syntax_file("Packages/QuickCal/Calendar.%s" % ST_SYNTAX)
         view.replace(edit, sublime.Region(0, view.size()), bfr)
         view.sel().clear()
@@ -475,6 +557,7 @@ class CalendarMonthNavCommand(sublime_plugin.TextCommand):
                     no_show_day=self.no_show_day
                 )
             )
+            self.view.settings().set('calendar_holidays', copy.deepcopy(CAL_HOLIDAYS.get(next_date.year, [])))
             self.view.sel().clear()
             self.view.settings().set("calendar_current", {"month": str(next_date.month), "year": next_date.year})
             self.view.set_read_only(True)
