@@ -1,7 +1,8 @@
 [![Unix Build Status][travis-image]][travis-link]
 ![License][license-image]
 # QuickCal
-<img src="http://dl.dropbox.com/u/342698/QuickCal/Example.png" border="0"/>
+
+![preview](docs/images/preview.png)
 
 Sublime Text plugin for viewing a quick, simple month calendar.
 

@@ -9,6 +9,19 @@
     // regions are referenced in you locale file.
     "region": "",
 
+    // Hide the holiday list under the calendar.
+    "hide_holiday_footer": false,
+
+    // If your theme does not support coloring the calendar boxes,
+    // this will highlight the day numbers.
+    "highlight_special_interest_days": true,
+
+    // Highlight holidays with the same color as the given scope.
+    "holiday_scope": "string",
+
+    // Highlight selected day (current day etc.) with the same color as the given scope.
+    "selected_scope": "keyword",
+
     // Start with Sunday first when displaying calendar
     "sunday_first": true,
 

@@ -341,7 +341,8 @@ class QuickCal(object):
         self.sunday_first = sunday_first
         self.force_update = force_update
         self.day_map = {}
-        self.region = ("", sublime.load_settings("quickcal.sublime-settings").get("region", ""))
+        settings = sublime.load_settings("quickcal.sublime-settings")
+        self.region = ("", settings.get("region", ""))
         week_no = tx_day("%d-%d-%d" % (int(month), 1, year)).week
 
         self.init_holidays()
@@ -384,7 +385,8 @@ class QuickCal(object):
                 week_no = 1
         bfr += CAL_ROW_BTM_DIV
 
-        bfr += self.list_holidays()
+        if not settings.get('hide_holiday_footer', False):
+            bfr += self.list_holidays()
         return bfr
 
 
@@ -474,8 +476,12 @@ class CalendarListener(sublime_plugin.EventListener):
                             pt2,
                             'holiday.calendar'
                         )
+                        center_special = view.score_selector(
+                            s.a,
+                            'holiday.calendar'
+                        )
 
-                        if top_special or bottom_special:
+                        if top_special or bottom_special or center_special:
                             if top_special and not bottom_special:
                                 center = pt1
                             elif bottom_special and not top_special:
@@ -499,7 +505,7 @@ class CalendarListener(sublime_plugin.EventListener):
         for d in view.settings().get('calendar_holidays', []):
             if d['date'] == target:
                 if d["region"] in region:
-                    bfr += "* %s: %s %s\n" % (
+                    bfr += "* **%s:**{: .keyword} %s %s\n" % (
                         d["date"],
                         d["description"],
                         "(Region: %s)" % d["region"] if d["region"] != "" else ""
@@ -516,12 +522,13 @@ class ShowCalendarCommand(sublime_plugin.TextCommand):
         """Run command."""
 
         view = self.view
+        settings = sublime.load_settings("quickcal.sublime-settings")
         today = get_today() if day is None else tx_day(day)
         bfr = QCAL.show_calendar_month(
             today.year,
             today.month,
             today.day,
-            sunday_first=sublime.load_settings("quickcal.sublime-settings").get("sunday_first", True),
+            sunday_first=settings.get("sunday_first", True),
             force_update=True
         )
         view.settings().set('calendar_holidays', copy.deepcopy(CAL_HOLIDAYS.get(today.year, [])))
@@ -530,8 +537,16 @@ class ShowCalendarCommand(sublime_plugin.TextCommand):
         view.sel().clear()
         view.settings().set("calendar_current", {"month": str(today.month), "year": today.year})
         view.settings().set("calendar_today", {"month": str(today.month), "year": today.year, "day": today.day})
+        view.settings().set('highlight_line', False)
         view.set_scratch(True)
         view.set_read_only(True)
+        self.view.erase_regions('quickcal_selected')
+        self.view.erase_regions('quickcal_holidays')
+        if settings.get('highlight_special_interest_days', True):
+            regions = self.view.find_by_selector('holiday.calendar')
+            view.add_regions('quickcal_holidays', regions, settings.get('holiday_scope', 'string'))
+            regions = self.view.find_by_selector('selected_day.calendar')
+            view.add_regions('quickcal_selected', regions, settings.get('selected_scope', 'keyword'))
 
 
 class CalendarMonthNavCommand(sublime_plugin.TextCommand):
@@ -541,6 +556,7 @@ class CalendarMonthNavCommand(sublime_plugin.TextCommand):
         """Run command."""
 
         self.no_show_day = False
+        settings = sublime.load_settings("quickcal.sublime-settings")
         current_month = self.view.settings().get("calendar_current", None)
         today = self.view.settings().get("calendar_today", None)
         if current_month is not None and today is not None:
@@ -553,14 +569,22 @@ class CalendarMonthNavCommand(sublime_plugin.TextCommand):
                     next_date.year,
                     next_date.month,
                     next_date.day,
-                    sunday_first=sublime.load_settings("quickcal.sublime-settings").get("sunday_first", True),
+                    sunday_first=settings.get("sunday_first", True),
                     no_show_day=self.no_show_day
                 )
             )
             self.view.settings().set('calendar_holidays', copy.deepcopy(CAL_HOLIDAYS.get(next_date.year, [])))
             self.view.sel().clear()
             self.view.settings().set("calendar_current", {"month": str(next_date.month), "year": next_date.year})
+            self.view.settings().set('highlight_line', False)
             self.view.set_read_only(True)
+            self.view.erase_regions('quickcal_selected')
+            self.view.erase_regions('quickcal_holidays')
+            if settings.get('highlight_special_interest_days', True):
+                regions = self.view.find_by_selector('holiday.calendar')
+                self.view.add_regions('quickcal_holidays', regions, settings.get('holiday_scope', 'string'))
+                regions = self.view.find_by_selector('selected_day.calendar')
+                self.view.add_regions('quickcal_selected', regions, settings.get('selected_scope', 'keyword'))
 
     def next(self, current, today):
         """Get next month."""

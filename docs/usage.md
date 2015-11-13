@@ -3,6 +3,21 @@ Configuring and using QuickCal.
 
 ---
 
+## General Use
+QuickCal can be run from the command palette to show the current month, or navigate through future or past months.  QuickCal can be even be configured to show holidays. If you have Sublime Text build 3080+, QuickCal can also show holiday tooltips that outline all of the holidays for the selected day.
+
+## Commands
+Calendar can be opened via commands from the command palette.  Once a calendar is shown, you can use the left and right arrow to navigate the months of the year.
+
+### CalendarCommand
+Shows todays date in the calendar (month view only)
+
+### CalendarLookupCommand
+Shows an input panel allowing the user to define what day they would like to see in the calendar.  Input is entered as `month/day/year`, where month, day, and year are numerical values.  Any non number delimiter can be used, so things like `3-2-2013` is also acceptable.
+
+### CalendarMonthNavCommand
+`CalendarMonthNavCommand` is a command that can only be run in a calendar view.  It allows you to navigate to the next or previous month.  It takes a directional option called `reverse`.  If `reverse` is set to `true`, the command will navigate to the previous month.
+
 ## Settings
 These are the available settings at the current time:
 
@@ -33,6 +48,39 @@ If you would like to view your calendar starting with Sunday as the first day, y
 ```js
     // Start with Sunday first when displaying calendar
     "sunday_first": true,
+```
+
+### hide_holiday_footer
+Hides the holiday list that appears under the calendar.
+
+```js
+    // Hide the holiday list under the calendar.
+    "hide_holiday_footer": false,
+```
+
+### highlight_special_interest_days
+Creates highlight regions around holidays and special interest days (like current day).  This is useful if your color scheme does not natively highlight the calendar scopes.
+
+```js
+    // If your theme does not support coloring the calendar boxes,
+    // this will highlight the day numbers.
+    "highlight_special_interest_days": true,
+```
+
+### holiday_scope
+Highlight holidays with the same color as the given scope.
+
+```js
+    // Highlight holidays with the same color as the given scope.
+    "holiday_scope": "constant.numeric",
+```
+
+### selected_scope
+Highlight selected day (current day etc.) with the same color as the given scope.
+
+```js
+    // Highlight selected day (current day etc.) with the same color as the given scope.
+    "selected_scope": "keyword.operator",
 ```
 
 ### offline_holidays
@@ -75,46 +123,34 @@ QuickCal allows for additional custom holidays.  You can add as many as you want
 }
 ```
 
-## Commands
-Calendar can be opened via commands from the command palette.  Once a calendar is shown, you can use the left and right arrow to navigate the months of the year.
-
-### CalendarCommand
-Shows todays date in the calendar (month view only)
-
-### CalendarLookupCommand
-Shows an input panel allowing the user to define what day they would like to see in the calendar.  Input is entered as `month/day/year`, where month, day, and year are numerical values.  Any non number delimiter can be used, so things like `3-2-2013` is also acceptable.
-
-### CalendarMonthNavCommand
-`CalendarMonthNavCommand` is a command that can only be run in a calendar view.  It allows you to navigate to the next or previous month.  It takes a directional option called `reverse`.  If `reverse` is set to `true`, the command will navigate to the previous month.
-
 ## Highlighting Current Days and Holidays
-By default, most color schemes will not highlight the current day, days of interest, or holidays.  You must update your color scheme file with something like the following to have highlighted days:
+By default, most color schemes won't highlight the current day and holidays.  For this reason, the `highlight_special_interest_days` settings was added to ensure special interest days still get highlighted.  If you would like to take control of the active day and holiday highlighting and have your color scheme natively highlight these days, you can edit your color scheme.  Active day calendar boxes are scoped as `selected_day.calendar` while holiday calendar boxes are scoped as `holiday.calendar`.  You must update your color scheme file with something like the following to have your color scheme highlight special interest days (don't forget to disable `highlight_special_interest_days`):
 
 ```xml
         <dict>
             <key>name</key>
             <string>Calendar Selected Day</string>
             <key>scope</key>
-            <string>selected_day</string>
+            <string>selected_day.calendar</string>
             <key>settings</key>
             <dict>
-                <key>foreground</key>
-                <string>#2D2D2D</string>
                 <key>background</key>
                 <string>#F2777A</string>
+                <key>foreground</key>
+                <string>#2D2D2D</string>
             </dict>
         </dict>
         <dict>
             <key>name</key>
             <string>Calendar Holiday</string>
             <key>scope</key>
-            <string>holiday</string>
+            <string>holiday.calendar</string>
             <key>settings</key>
             <dict>
-                <key>foreground</key>
-                <string>#2D2D2D</string>
                 <key>background</key>
                 <string>#66CCCC</string>
+                <key>foreground</key>
+                <string>#2D2D2D</string>
             </dict>
         </dict>
 ```
