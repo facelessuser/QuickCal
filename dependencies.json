@@ -2,7 +2,7 @@
     "*": {
         ">=3000": [
             "pygments",
-            "markdown",
+            "python-markdown",
             "mdpopups",
             "jinja2",
             "markupsafe"
