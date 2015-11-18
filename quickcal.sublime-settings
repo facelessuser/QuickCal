@@ -29,6 +29,10 @@
     // Note: currently only US and a few world wide holidays are supported.
     "offline_holidays": false,
 
+    // Show holiday tooltip when cursor is on a day that is a holiday
+    // ST3 build 3080+ only
+    "use_holiday_tooltips": true,
+
     // Default internal holiday lists
     "default_holiday_lists": {
         "christian": false,          // Christian (a lot are specifically Catholic)

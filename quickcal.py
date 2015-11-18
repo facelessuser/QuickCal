@@ -18,7 +18,7 @@ import urllib.request
 from QuickCal.lib import calendarevents
 import copy
 
-TOOLTIP_SUPPORT = int(sublime.version()) >= 3072
+TOOLTIP_SUPPORT = int(sublime.version()) >= 3080
 
 if TOOLTIP_SUPPORT:
     import mdpopups
@@ -450,7 +450,11 @@ class CalendarListener(sublime_plugin.EventListener):
     def on_selection_modified(self, view):
         """Find and display popup of special day."""
 
-        if not TOOLTIP_SUPPORT or (self.last is not None and (time.time() - self.last) < 1):
+        if (
+            not TOOLTIP_SUPPORT or
+            not sublime.load_settings("quickcal.sublime-settings").get("use_holiday_tooltips", True) or
+            (self.last is not None and (time.time() - self.last) < 1)
+        ):
             return
 
         current_month = view.settings().get("calendar_current", None)
