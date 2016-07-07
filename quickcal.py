@@ -19,6 +19,8 @@ from QuickCal.lib import calendarevents
 import copy
 
 TOOLTIP_SUPPORT = int(sublime.version()) >= 3080
+HOVER_SUPPORT = int(sublime.version()) >= 3116
+
 
 if TOOLTIP_SUPPORT:
     import mdpopups
@@ -104,11 +106,27 @@ class CalendarEventListener(sublime_plugin.EventListener):
                 return True
         return False
 
+    def on_hover(self, view, point, hover_zone):
+        """On Hover calendar."""
+
+        if (
+            not HOVER_SUPPORT or
+            hover_zone != sublime.HOVER_TEXT or
+            not TOOLTIP_SUPPORT or
+            not sublime.load_settings("quickcal.sublime-settings").get("use_holiday_tooltips", True)
+        ):
+            return
+
+        current_month = view.settings().get("calendar_current", None)
+        if current_month is not None:
+            if view.score_selector(point, 'holiday.calendar, selected_day.calendar'):
+                self.show_holiday(view, current_month, point)
+
     def on_selection_modified(self, view):
         """Find and display popup of special day."""
 
         if (
-            not TOOLTIP_SUPPORT or
+            not TOOLTIP_SUPPORT or HOVER_SUPPORT or
             not sublime.load_settings("quickcal.sublime-settings").get("use_holiday_tooltips", True) or
             (self.last is not None and (time.time() - self.last) < 1)
         ):
@@ -120,44 +138,45 @@ class CalendarEventListener(sublime_plugin.EventListener):
             if len(sel):
                 s = sel[0]
                 if s.size() == 0:
-                    is_special = view.score_selector(
-                        s.a,
-                        'holiday.calendar, selected_day.calendar'
-                    )
-                    center = None
-                    if is_special:
-                        row, col = view.rowcol(s.a)
-                        pt1 = view.text_point(row - 1, col)
-                        top_special = view.score_selector(
-                            pt1,
-                            'holiday.calendar'
-                        )
-                        pt2 = view.text_point(row + 1, col)
-                        bottom_special = view.score_selector(
-                            pt2,
-                            'holiday.calendar'
-                        )
-                        center_special = view.score_selector(
-                            s.a,
-                            'holiday.calendar'
-                        )
+                    if view.score_selector(s.a, 'holiday.calendar, selected_day.calendar'):
+                        self.show_holiday(view, current_month, s.a)
 
-                        if top_special or bottom_special or center_special:
-                            if top_special and not bottom_special:
-                                center = pt1
-                            elif bottom_special and not top_special:
-                                center = pt2
-                            else:
-                                center = s.a
+    def show_holiday(self, view, current_month, pt):
+        """Show holiday if on holiday."""
 
-                            m = re.search(r'(\d+)', view.substr(view.extract_scope(center)))
-                            day = m.group(1)
+        center = None
+        row, col = view.rowcol(pt)
+        pt1 = view.text_point(row - 1, col)
+        top_special = view.score_selector(
+            pt1,
+            'holiday.calendar'
+        )
+        pt2 = view.text_point(row + 1, col)
+        bottom_special = view.score_selector(
+            pt2,
+            'holiday.calendar'
+        )
+        center_special = view.score_selector(
+            pt,
+            'holiday.calendar'
+        )
 
-                            self.get_holidays(
-                                view, int(day), int(MONTHS(current_month['month'])), current_month['year']
-                            )
+        if top_special or bottom_special or center_special:
+            if top_special and not bottom_special:
+                center = pt1
+            elif bottom_special and not top_special:
+                center = pt2
+            else:
+                center = pt
 
-    def get_holidays(self, view, day, month, year):
+            m = re.search(r'(\d+)', view.substr(view.extract_scope(center)))
+            day = m.group(1)
+
+            self.get_holidays(
+                view, int(day), int(MONTHS(current_month['month'])), current_month['year'], pt
+            )
+
+    def get_holidays(self, view, day, month, year, pt):
         """Get the holidays for the given day."""
 
         bfr = ''
@@ -172,7 +191,12 @@ class CalendarEventListener(sublime_plugin.EventListener):
                         "(Region: %s)" % d["region"] if d["region"] != "" else ""
                     )
 
-        mdpopups.show_popup(view, '## Holidays\n' + bfr)
+        mdpopups.show_popup(
+            view,
+            '## Holidays\n' + bfr,
+            location=pt,
+            flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY if HOVER_SUPPORT else 0
+        )
         self.last = time.time()
 
 
