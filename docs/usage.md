@@ -4,7 +4,7 @@ Configuring and using QuickCal.
 ---
 
 ## General Use
-QuickCal can be run from the command palette to show the current month, or navigate through future or past months.  QuickCal can be even be configured to show holidays. If you have Sublime Text build 3080+, QuickCal can also show holiday tooltips that outline all of the holidays for the selected day.
+QuickCal can be run from the command palette to show the current month, or navigate through future or past months.  QuickCal can be even be configured to show holidays. If you have Sublime Text build 3080+, QuickCal can also show holiday tooltips that outline all of the holidays for the selected day (in version of Sublime 3116+, tooltip appears on hover instead).
 
 ## Commands
 Calendar can be opened via commands from the command palette.  Once a calendar is shown, you can use the left and right arrow to navigate the months of the year.
