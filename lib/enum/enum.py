@@ -1,7 +1,7 @@
 """
 Enum.
 
-Copyright (c) 2012 Isaac Muse <isaacmuse@gmail.com>
+Copyright (c) 2012 - 2016 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
 # pylint: disable=protected-access

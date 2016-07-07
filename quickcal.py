@@ -2,7 +2,7 @@
 """
 Calendar Viewer.
 
-Copyright (c) 2012 - 2015 Isaac Muse <isaacmuse@gmail.com>
+Copyright (c) 2012 - 2016 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
 
