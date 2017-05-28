@@ -17,18 +17,35 @@
                         "children":
                         [
                             {
-                                "command": "open_file", "args":
-                                {
-                                    "file": "${packages}/QuickCal/quickcal.sublime-settings"
+                                "command": "edit_settings", "args": {
+                                    "base_file": "${packages}/QuickCal/quickcal.sublime-settings",
+                                    "default": "{\n$0\n}\n"
                                 },
-                                "caption": "Settings – Default"
+                                "caption": "Settings"
+                            },
+                            { "caption": "-" },
+                            {
+                                "caption": "Changelog",
+                                "command": "quick_cal_changes"
                             },
                             {
-                                "command": "open_file", "args":
-                                {
-                                    "file": "${packages}/User/quickcal.sublime-settings"
-                                },
-                                "caption": "Settings – User"
+                                "caption": "Documentation",
+                                "command": "quick_cal_open_site",
+                                "args": {
+                                    "url": "http://facelessuser.github.io/QuickCal/"
+                                }
+                            },
+                            { "caption": "-" },
+                            {
+                                "caption": "Support Info",
+                                "command": "quick_cal_support_info"
+                            },
+                            {
+                                "caption": "Issues",
+                                "command": "quick_cal_open_site",
+                                "args": {
+                                    "url": "https://github.com/facelessuser/QuickCal/issues"
+                                }
                             }
                         ]
                     }
