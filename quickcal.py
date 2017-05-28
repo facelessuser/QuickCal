@@ -18,13 +18,20 @@ import urllib.request
 from QuickCal.lib import calendarevents
 import copy
 
-TOOLTIP_SUPPORT = int(sublime.version()) >= 3080
-HOVER_SUPPORT = int(sublime.version()) >= 3116
-
+TOOLTIP_SUPPORT = int(sublime.version()) >= 3124
 
 if TOOLTIP_SUPPORT:
     import mdpopups
     import time
+
+CSS = '''\
+{%- if var.mdpopups_version >= (2, 0, 0) %}
+div.quick-cal { margin: 0; padding: 0.5rem; }
+{%- else %}
+div.scope-hunter { margin: 0; padding: 0; }
+{%- endif %}
+.quick-cal .header { {{'.string'|css('color')}} }
+'''
 
 USE_ST_SYNTAX = int(sublime.version()) >= 3092
 ST_SYNTAX = "sublime-syntax" if USE_ST_SYNTAX else 'tmLanguage'
@@ -110,9 +117,8 @@ class CalendarEventListener(sublime_plugin.EventListener):
         """On Hover calendar."""
 
         if (
-            not HOVER_SUPPORT or
-            hover_zone != sublime.HOVER_TEXT or
             not TOOLTIP_SUPPORT or
+            hover_zone != sublime.HOVER_TEXT or
             not sublime.load_settings("quickcal.sublime-settings").get("use_holiday_tooltips", True)
         ):
             return
@@ -126,7 +132,7 @@ class CalendarEventListener(sublime_plugin.EventListener):
         """Find and display popup of special day."""
 
         if (
-            not TOOLTIP_SUPPORT or HOVER_SUPPORT or
+            not TOOLTIP_SUPPORT or
             not sublime.load_settings("quickcal.sublime-settings").get("use_holiday_tooltips", True) or
             (self.last is not None and (time.time() - self.last) < 1)
         ):
@@ -193,9 +199,11 @@ class CalendarEventListener(sublime_plugin.EventListener):
 
         mdpopups.show_popup(
             view,
-            '## Holidays\n' + bfr,
+            '## Holidays {: .header}\n' + bfr,
+            css=CSS,
+            wrapper_class='quick-cal',
             location=pt,
-            flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY if HOVER_SUPPORT else 0
+            flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY
         )
         self.last = time.time()
 
