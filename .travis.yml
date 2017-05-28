@@ -2,7 +2,7 @@ language: python
 python:
   - "3.3"
 install:
-  - pip install flake8<3
+  - pip install "flake8<3.0"
   - pip install flake8-docstrings
   - pip install pep8-naming
   - pip install flake8-putty

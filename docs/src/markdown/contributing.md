@@ -75,7 +75,7 @@ There are a couple of dependencies that must be present before running the tests
 3. Linting is performed on the entire project with `flake8`, `flake8_docstrings`, `pep8-naming`, and `flak8-putty`.  These can be installed via:
 
     ```
-    pip install flake8<3
+    pip install flake8<3.0
     pip install flake8_docstrings
     pip install pep8-naming
     pip install flake8-putty
