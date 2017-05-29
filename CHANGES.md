@@ -1,3 +1,9 @@
+# QuickCal 2.3.2
+
+> Released May 29, 2017
+
+- **FIX**: Fix other bad repository reference in update message.
+
 # QuickCal 2.3.1
 
 > Released May 29, 2017
