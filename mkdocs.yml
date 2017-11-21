@@ -1,7 +1,24 @@
 site_name: QuickCal Documentation
+site_url: https://facelessuser.github.io/QuickCal
 repo_url: https://github.com/facelessuser/QuickCal
+edit_uri: tree/master/docs/src/markdown
 site_description: Sublime Plugin that shows a quick month calender.
-copyright: Copyright &copy; 2012 - 2015 <a href="https://github.com/facelessuser">Isaac Muse</a>
+copyright: |
+  Copyright &copy; 2012 - 2017 <a href="https://github.com/facelessuser">Isaac Muse</a>
+  <br><span class="md-footer-custom-text">emoji provided free by </span><a href="http://www.emojione.com">EmojiOne</a>
+
+docs_dir: docs/src/markdown
+theme:
+  name: material
+  custom_dir: docs/theme
+  palette:
+    primary: blue
+    accent: blue
+  logo:
+    icon: description
+  font:
+    text: Roboto
+    code: Roboto Mono
 
 pages:
   - User Guide: index.md
@@ -9,14 +26,10 @@ pages:
   - Contributing &amp; Support: contributing.md
   - License: license.md
 
-theme: material
-docs_dir: docs/src/markdown
-theme_dir: docs/theme
-
 markdown_extensions:
   - markdown.extensions.toc:
       slugify: !!python/name:pymdownx.slugs.uslugify
-      permalink: 
+      permalink: "\ue157"
   - markdown.extensions.admonition:
   - markdown.extensions.smarty:
       smart_quotes: false
@@ -37,7 +50,9 @@ markdown_extensions:
   - pymdownx.inlinehilite:
   - pymdownx.magiclink:
       repo_url_shortener: true
-      base_repo_url: https://github.com/facelessuser/QuickCal
+      repo_url_shorthand: true
+      user: facelessuser
+      repo: QuickCal
   - pymdownx.tilde:
   - pymdownx.caret:
   - pymdownx.smartsymbols:
@@ -54,20 +69,14 @@ markdown_extensions:
   - pymdownx.snippets:
       base_path: docs/src/markdown/_snippets
   - pymdownx.keys:
-      separator: ＋
-  - pymdownx.spoilers:
+      separator: "\uff0b"
+  - pymdownx.details:
 
 extra:
-  palette:
-    primary: blue
-    accent: blue
-  font:
-    text: Roboto
-    code: Roboto Mono
   social:
     - type: github
       link: https://github.com/facelessuser
 extra_css:
-  - extra-effadd97dd.css
+  - extra-f8303dea60.css
 extra_javascript:
-  - extra-0d49409391.js
+  - extra-d8800ea088.js

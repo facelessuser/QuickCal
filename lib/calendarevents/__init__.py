@@ -97,7 +97,7 @@ class Holidays(object):
                 d = holiday(self.year)
                 self.holidays[simple_name] = Holiday(name, d, holiday)
             elif isinstance(holiday, (list, tuple)) and len(holiday) == 2:
-                function = lambda y, m=holiday[0], d=holiday[1]: date(y, m, d)
+                function = lambda y, m=holiday[0], d=holiday[1]: date(y, m, d)  # noqa: E731
                 d = function(self.year)
                 self.holidays[simple_name] = Holiday(name, d, function)
             else:

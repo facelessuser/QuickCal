@@ -2,5 +2,5 @@
 
 New release!
 
-See `Preferences->Package Settings->QuickCal->Changelog` for more info on 
+See `Preferences->Package Settings->TabsExtra->Changelog` for more info on 
 the release.
