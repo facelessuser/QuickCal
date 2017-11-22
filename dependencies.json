@@ -7,7 +7,7 @@
             "python-jinja2",
             "markupsafe",
             "pymdownx",
-            "Pyyaml"
+            "pyyaml"
         ]
     }
 }

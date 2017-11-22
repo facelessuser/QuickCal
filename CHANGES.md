@@ -1,3 +1,9 @@
+# QuickCal 2.3.4
+
+> Released Nov 22, 2017
+
+- **FIX**: Fix incorrect `pyyaml` dependency casing.
+
 # QuickCal 2.3.3
 
 > Released Nov 20, 2017
