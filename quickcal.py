@@ -543,6 +543,7 @@ class CalendarCommand(sublime_plugin.WindowCommand):
             view = self.window.new_file()
             view.set_name(".calendar")
             view.settings().set("draw_white_space", "none")
+            view.settings().set("draw_unicode_white_space", "none")
         else:
             view.set_read_only(False)
             self.window.focus_view(view)
