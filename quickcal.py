@@ -591,7 +591,7 @@ class CalendarMonthNavCommand(sublime_plugin.TextCommand):
         today = self.view.settings().get("calendar_today", None)
         if current_month is not None and today is not None:
             self.view.set_read_only(False)
-            next_date = self.next(current_month, today) if not reverse else self.previous(current_month, today)
+            next_date = self.get_next(current_month, today) if not reverse else self.get_previous(current_month, today)
             self.view.replace(
                 edit,
                 sublime.Region(0, self.view.size()),
@@ -616,7 +616,7 @@ class CalendarMonthNavCommand(sublime_plugin.TextCommand):
                 regions = self.view.find_by_selector('selected_day.calendar')
                 self.view.add_regions('quickcal_selected', regions, settings.get('selected_scope', 'keyword'))
 
-    def next(self, current, today):
+    def get_next(self, current, today):
         """Get next month."""
 
         m = MONTHS(current["month"])
@@ -628,7 +628,7 @@ class CalendarMonthNavCommand(sublime_plugin.TextCommand):
             day = 1
         return Day(day, next_month, year)
 
-    def previous(self, current, today):
+    def get_previous(self, current, today):
         """Get previous month."""
 
         m = MONTHS(current["month"])

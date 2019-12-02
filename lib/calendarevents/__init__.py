@@ -32,7 +32,7 @@ from . import world_wide_observance_holidays
 from . import us_state_birthday_holidays
 import re
 
-WORD_CHARS = re.compile('\w', re.UNICODE)
+WORD_CHARS = re.compile(r'\w', re.UNICODE)
 
 
 def get_current_year():
