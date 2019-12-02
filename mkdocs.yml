@@ -20,7 +20,7 @@ theme:
     text: Roboto
     code: Roboto Mono
 
-pages:
+nav:
   - User Guide: index.md
   - Installation: installation.md
   - Contributing &amp; Support: contributing.md
@@ -57,6 +57,7 @@ markdown_extensions:
   - pymdownx.caret:
   - pymdownx.smartsymbols:
   - pymdownx.emoji:
+      #emoji_index: !!python/name:pymdownx.emoji.twemoji
       emoji_generator: !!python/name:pymdownx.emoji.to_png
   - pymdownx.escapeall:
       hardbreak: true
@@ -64,8 +65,7 @@ markdown_extensions:
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.progressbar:
-  - pymdownx.plainhtml:
-      strip_attributes: ''
+  - pymdownx.striphtml:
   - pymdownx.snippets:
       base_path: docs/src/markdown/_snippets
   - pymdownx.keys:
