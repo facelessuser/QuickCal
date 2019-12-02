@@ -1,1 +1,1 @@
-"""Quickcal lib."""
+"""QuickCal lib."""

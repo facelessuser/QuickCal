@@ -52,7 +52,7 @@ CAL_HEADER = "   |{0:^69}|\n"
 CAL_ROW_TOP_DIV = "   -----------------------------------------------------------------------\n"
 CAL_ROW_MID_DIV = "   -----------------------------------------------------------------------\n"
 CAL_ROW_BTM_DIV = "   -----------------------------------------------------------------------\n"
-# (NO-BREAK SPACE) Unicode point U+00A0 or 0xC2A0: denoted with "."
+# (NO-BREAK SPACE) Unicode point `U+00A0` or `0xC2A0`: denoted with "."
 # "...{0: ^3}..."
 # "........."
 CAL_CELL_CENTER_HIGHLIGHT = "   {0: ^3}   "
@@ -238,7 +238,7 @@ class Day(object):
         self.week = week
 
     def __unicode__(self):
-        """Convert to unicode."""
+        """Convert to Unicode."""
 
         return self.str
 
@@ -249,7 +249,7 @@ class Day(object):
 
 
 class QuickCal(object):
-    """Quickcal."""
+    """QuickCal."""
 
     def init_holidays(self):
         """Initialize holidays."""
@@ -300,7 +300,7 @@ class QuickCal(object):
             CAL_HOLIDAYS[self.year].sort(key=lambda x: x["date"])
 
     def offline_holidays(self, settings):
-        """Generate holidays internally via calendarevents plus custom holidays."""
+        """Generate holidays internally via `calendarevents` plus custom holidays."""
 
         global CAL_HOLIDAYS
         custom = settings.get('custom_holidays')
