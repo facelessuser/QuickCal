@@ -20,6 +20,11 @@ import copy
 
 TOOLTIP_SUPPORT = int(sublime.version()) >= 3124
 
+try:
+    FLAGS = sublime.DRAW_NO_OUTLINE
+except Exception:
+    FLAGS = 0
+
 if TOOLTIP_SUPPORT:
     import mdpopups
     import time
@@ -574,9 +579,9 @@ class ShowCalendarCommand(sublime_plugin.TextCommand):
         self.view.erase_regions('quickcal_holidays')
         if settings.get('highlight_special_interest_days', True):
             regions = self.view.find_by_selector('holiday.calendar')
-            view.add_regions('quickcal_holidays', regions, settings.get('holiday_scope', 'string'))
+            view.add_regions('quickcal_holidays', regions, settings.get('holiday_scope', 'string'), '', FLAGS)
             regions = self.view.find_by_selector('selected_day.calendar')
-            view.add_regions('quickcal_selected', regions, settings.get('selected_scope', 'keyword'))
+            view.add_regions('quickcal_selected', regions, settings.get('selected_scope', 'keyword'), '', FLAGS)
 
 
 class CalendarMonthNavCommand(sublime_plugin.TextCommand):

@@ -1,30 +1,26 @@
-# QuickCal 2.3.4
+# QuickCal
 
-> Released Nov 22, 2017
+## 2.4.0
+
+- **NEW**: Don't render outline on when highlighting special days with regions.
+
+## 2.3.4
 
 - **FIX**: Fix incorrect `pyyaml` dependency casing.
 
-# QuickCal 2.3.3
-
-> Released Nov 20, 2017
+## 2.3.3
 
 - **FIX**: Update dependencies.
 
-# QuickCal 2.3.2
-
-> Released May 29, 2017
+## 2.3.2
 
 - **FIX**: Fix other bad repository reference in update message.
 
-# QuickCal 2.3.1
-
-> Released May 29, 2017
+## 2.3.1
 
 - **FIX**: Fix bad repository reference in update message.
 
-# QuickCal 2.3.0
-
-> Released May 27, 2017
+## 2.3.0
 
 - **NEW**: New support commands.
 - **NEW**: Popups only on 3124+.
