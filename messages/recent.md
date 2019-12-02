@@ -1,4 +1,4 @@
-# QuickCal 2.3.0
+# QuickCal 2.4.0
 
 New release!
 
