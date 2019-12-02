@@ -33,8 +33,6 @@ div.scope-hunter { margin: 0; padding: 0; }
 .quick-cal .header { {{'.string'|css('color')}} }
 '''
 
-USE_ST_SYNTAX = int(sublime.version()) >= 3092
-ST_SYNTAX = "sublime-syntax" if USE_ST_SYNTAX else 'tmLanguage'
 MONTHS = enum(
     "January February March April May June July August September October November December",
     start=1, name="Months"
@@ -564,7 +562,7 @@ class ShowCalendarCommand(sublime_plugin.TextCommand):
             force_update=True
         )
         view.settings().set('calendar_holidays', copy.deepcopy(CAL_HOLIDAYS.get(today.year, [])))
-        view.set_syntax_file("Packages/QuickCal/Calendar.%s" % ST_SYNTAX)
+        view.set_syntax_file("Packages/QuickCal/Calendar.sublime-syntax")
         view.replace(edit, sublime.Region(0, view.size()), bfr)
         view.sel().clear()
         view.settings().set("calendar_current", {"month": str(today.month), "year": today.year})
