@@ -13,7 +13,7 @@ Sublime Text plugin for viewing a quick, simple month calendar.
 - Shows week numbers for the year.
 
 # Documentation
-http://facelessuser.github.io/QuickCal/
+https://facelessuser.github.io/QuickCal/
 
 # Thanks
 
