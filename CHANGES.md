@@ -3,6 +3,7 @@
 ## 2.4.0
 
 - **NEW**: Don't render outline on when highlighting special days with regions.
+- **FIX**: Fix Unicode whitespace issue with Sublime Text 4 preview.
 
 ## 2.3.4
 
