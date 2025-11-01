@@ -27,6 +27,7 @@ mkdocs
 natively
 online
 packagecontrol
+pastable
 plugin
 plugin's
 plugins

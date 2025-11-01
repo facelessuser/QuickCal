@@ -9,13 +9,13 @@ License: MIT
 from datetime import date, datetime
 import sublime_plugin
 import sublime
-from QuickCal.lib.enum.enum import enum
+from .lib.enum.enum import enum
 import re
 import os
 from os.path import join, exists
 import json
 import urllib.request
-from QuickCal.lib import calendarevents
+from .lib import calendarevents
 import copy
 
 TOOLTIP_SUPPORT = int(sublime.version()) >= 3124

@@ -5,7 +5,7 @@ import textwrap
 import webbrowser
 import re
 
-__version__ = "2.4.0"
+__version__ = "2.4.1"
 __pc_name__ = 'QuickCal'
 
 
@@ -157,11 +157,8 @@ class QuickCalDocCommand(sublime_plugin.WindowCommand):
 
         try:
             import mdpopups
-            import pymdownx
             has_phantom_support = (mdpopups.version() >= (1, 10, 0)) and (int(sublime.version()) >= 3124)
-            fmatter = mdpopups.format_frontmatter(frontmatter) if pymdownx.version_info[:3] >= (4, 3, 0) else ''
         except Exception:
-            fmatter = ''
             has_phantom_support = False
 
         if not has_phantom_support:
@@ -177,7 +174,7 @@ class QuickCalDocCommand(sublime_plugin.WindowCommand):
                     view,
                     'quickstart',
                     sublime.Region(0),
-                    fmatter + text,
+                    text,
                     sublime.LAYOUT_INLINE,
                     css=CSS,
                     wrapper_class="quick-cal",
@@ -196,11 +193,8 @@ class QuickCalChangesCommand(sublime_plugin.WindowCommand):
         """Show the changelog in a new view."""
         try:
             import mdpopups
-            import pymdownx
             has_phantom_support = (mdpopups.version() >= (1, 10, 0)) and (int(sublime.version()) >= 3124)
-            fmatter = mdpopups.format_frontmatter(frontmatter) if pymdownx.version_info[:3] >= (4, 3, 0) else ''
         except Exception:
-            fmatter = ''
             has_phantom_support = False
 
         text = sublime.load_resource('Packages/QuickCal/CHANGES.md')
@@ -213,7 +207,7 @@ class QuickCalChangesCommand(sublime_plugin.WindowCommand):
                 view,
                 'changelog',
                 sublime.Region(0),
-                fmatter + text,
+                text,
                 sublime.LAYOUT_INLINE,
                 wrapper_class="quick-cal",
                 css=CSS,
