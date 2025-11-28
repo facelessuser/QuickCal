@@ -1,5 +1,9 @@
 # QuickCal
 
+## 2.5.0
+
+-   **NEW**: Changes to support Python 3.13 on ST 4201+.
+
 ## 2.4.1
 
 -   **FIX**: Small code fixes related to importing.

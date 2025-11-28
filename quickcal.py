@@ -455,7 +455,7 @@ class QuickCal(object):
 
         self.init_holidays()
         num_days = self.days_in_months()
-        weekday_month_start = WEEKDAYS(date(year, month, 1).isoweekday())
+        weekday_month_start = WEEKDAYS(date(year, int(month), 1).isoweekday())
         if sunday_first:
             offset = int(weekday_month_start) if weekday_month_start != WEEKDAYS.Sunday else 0
         else:
